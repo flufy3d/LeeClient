@@ -4,6 +4,7 @@ import os
 import platform
 import subprocess
 import sys
+import glob
 
 from PyLibs import LeeCommon, LeePatchManager
 
@@ -12,6 +13,11 @@ class LeeGrf:
     def __init__(self):
         self.leeCommon = LeeCommon()
         self.patchManager = LeePatchManager()
+    
+    def isGrfExists(self):
+        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        grfFiles = glob.glob('%s/*.grf' % leeClientDir[:-1])
+        return len(grfFiles) > 0
 
     def makeGrf(self, dataDirpath, grfOutputPath):
         # 确认操作系统平台
@@ -32,8 +38,8 @@ class LeeGrf:
         # 确认有足够的磁盘剩余空间进行压缩
         currentDriver = self.leeCommon.getScriptDirectory()[0]
         currentFreeSpace = self.leeCommon.getDiskFreeSpace(currentDriver)
-        if currentFreeSpace <= 1024 * 1024 * 1024 * 2:
-            self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 2GB, 请清理磁盘释放更多空间.' % currentDriver)
+        if currentFreeSpace <= 1024 * 1024 * 1024 * 3:
+            self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 3GB, 请清理磁盘释放更多空间.' % currentDriver)
 
         # 确认 GrfCL 文件存在
         scriptDir = self.leeCommon.getScriptDirectory()
@@ -44,17 +50,16 @@ class LeeGrf:
         # data.grf 文件若存在则进行覆盖确认
         if self.leeCommon.isFileExists(grfOutputPath):
             lines = [
-                '发现客户端目录中已存在名为 data.grf 的文件,',
+                '发现客户端目录中已存在 %s 文件,' % os.path.basename(grfOutputPath),
                 '若继续将会先删除此文件, 为避免文件被误删, 请您进行确认.'
             ]
             title = '文件覆盖提示'
-            prompt = '是否删除 data.grf 文件并继续?'
-            if not self.leeCommon.simpleConfirm(lines, title, prompt, None, None):
+            prompt = '是否删除文件并继续?'
+            if not self.leeCommon.confirm(lines, title, prompt, None, None, None):
                 self.leeCommon.exitWithMessage('由于您放弃继续, 程序已自动终止.')
             os.remove(grfOutputPath)
 
         # 执行压缩工作（同步等待）
-        self.leeCommon.cleanScreen()
         grfCLProc = subprocess.Popen('%s %s' % (
             grfCLFilepath,
             '-breakOnExceptions true -makeGrf "%s" "%s"' % (
@@ -66,6 +71,9 @@ class LeeGrf:
 
         # 确认结果并输出提示信息表示压缩结束
         if grfCLProc.returncode == 0 and self.leeCommon.isFileExists(grfOutputPath):
-            self.leeCommon.exitWithMessage('已经将 data 目录压缩为 data.grf 并存放到根目录.')
+            print('已经将 data 目录压缩为 data.grf 并存放到根目录.')
+            print('')
+            self.leeCommon.printSmallCutLine()
+            print('')
         else:
             self.leeCommon.exitWithMessage('进行压缩工作的时候发生错误, 请发 Issue 进行反馈.')

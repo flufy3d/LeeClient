@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os
-from PyLibs import LeeTowninfoLua
-from PyLibs import LeeCommon
-from PyLibs import LeeBaseTranslator
+from PyLibs import LeeBaseTranslator, LeeTowninfoLua
+
 
 class LeeTowninfoTranslator(LeeBaseTranslator):
     def __init__(self):

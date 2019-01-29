@@ -8,8 +8,9 @@ import subprocess
 import sys
 import time
 import uuid
+import glob
 
-from PyLibs import LeeCommon, LeeConfigure, LeePatchManager, LeeZipfile
+from PyLibs import LeeCommon, LeeConfigure, LeePatchManager, LeeZipfile, LeeGrf
 
 if platform.system() == 'Windows':
     import winreg
@@ -18,8 +19,41 @@ class LeePublisher:
     def __init__(self):
         self.leeCommon = LeeCommon()
         self.patchManager = LeePatchManager()
+    
+    def removeOldGrf(self):
+        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        grfFiles = glob.glob('%s/*.grf' % leeClientDir[:-1])
 
-    def makeSource(self):
+        for filepath in grfFiles:
+            os.remove(filepath)
+
+    def ensureHasGRF(self):
+        leeClientDir = self.leeCommon.getLeeClientDirectory()
+
+        if LeeGrf().isGrfExists():            
+            reUseExistsGrfFiles = self.leeCommon.confirm(
+                [
+                    '当前客户端目录已经存在了 Grf 文件',
+                    '请问是直接使用他们(y), 还是需要重新生成(n)?',
+                    '',
+                    '注意: 若选重新生成(n), 那么目前的 Grf 文件将被立刻删除.'
+                ],
+                title='文件覆盖确认',
+                prompt='是否继续使用这些 Grf 文件?',
+                inject=self,
+                cancelExec='inject.removeOldGrf()',
+                evalcmd=None
+            )
+
+            if reUseExistsGrfFiles:
+                return
+        
+        LeeGrf().makeGrf('%sdata' % leeClientDir, '%sdata.grf' % leeClientDir)
+
+        if not LeeGrf().isGrfExists():
+            self.leeCommon.exitWithMessage('请先将 data 目录打包为 Grf 文件, 以便提高文件系统的复制效率.')       
+
+    def makeSource(self, useGrf):
         '''
         将 LeeClient 的内容复制到打包源目录(并删除多余文件)
         '''
@@ -27,17 +61,16 @@ class LeePublisher:
 
         # 判断是否已经切换到某个客户端版本
         if not self.patchManager.canRevert():
-            self.leeCommon.exitWithMessage('请先将 LeeClient 切换到某个客户端版本, 以便制作出来的 grf 文件内容完整.')
+            self.leeCommon.exitWithMessage('请先将 LeeClient 切换到某个客户端版本, 否则制作出来的 grf 内容不完整.')
 
-        # 判断 grf 文件是否已经生成
-        if not self.leeCommon.isFileExists('%sdata.grf' % leeClientDir):
-            self.leeCommon.exitWithMessage('请先将 data 目录打包为 data.grf, 以便提高文件系统的复制效率.')
+        if useGrf:
+            self.ensureHasGRF()
 
         # 判断磁盘的剩余空间是否足够
         currentDriver = self.leeCommon.getScriptDirectory()[0]
         currentFreeSpace = self.leeCommon.getDiskFreeSpace(currentDriver)
-        if currentFreeSpace <= 1024 * 1024 * 1024 * 3:
-            self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 3GB, 请清理磁盘释放更多空间.' % currentDriver)
+        if currentFreeSpace <= 1024 * 1024 * 1024 * 4:
+            self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 4 GB, 请清理磁盘释放更多空间.' % currentDriver)
 
         # 生成一个 LeeClient 平级的发布目录
         nowTime = time.strftime("%Y%m%d_%H%M%S", time.localtime())
@@ -48,8 +81,12 @@ class LeePublisher:
         )
 
         # 先列出需要复制到打包源的文件列表
-        filterDirectories = ['Utility', 'data', '.git', '.vscode']
+        filterDirectories = ['Utility', '.git', '.vscode']
         filterFiles = ['.gitignore', '.DS_Store']
+
+        # 若使用 grf 文件的话, 则排除掉 data 目录
+        if useGrf:
+            filterDirectories.append('data')
 
         copyFileList = []
         for dirpath, _dirnames, filenames in os.walk(os.path.join(leeClientDir, leeClientDir)):
@@ -255,17 +292,21 @@ class LeePublisher:
         检查 Inno Setup 的状态是否正常且符合要求
         '''
         innoSetupDir = self.__getInnoSetupInstallPath()
-        if innoSetupDir is None: return False
+        if innoSetupDir is None:
+            return False
 
         # Inno Setup 是否已经安装
-        if not self.__isInnoSetupInstalled(): return False
+        if not self.__isInnoSetupInstalled():
+            return False
 
         # Inno Setup 的 ISCC.exe 是否存在
-        if not self.leeCommon.isFileExists('%sISCC.exe' % innoSetupDir): return False
+        if not self.leeCommon.isFileExists('%sISCC.exe' % innoSetupDir):
+            return False
 
         # 是否已经安装了 SetupLdr.e32 补丁
         setupLdrMD5 = self.leeCommon.getMD5ForSmallFile('%sSetupLdr.e32' % innoSetupDir)
-        if setupLdrMD5 != '544dbcf30c8ccb55082709b095173f6c': return False
+        if setupLdrMD5 != '544dbcf30c8ccb55082709b095173f6c':
+            return False
 
         return True
 
@@ -282,13 +323,14 @@ class LeePublisher:
             return False
 
         # 执行静默安装过程
-        setupProc = subprocess.Popen('%s /VERYSILENT' % installerFilepath,
+        setupProc = subprocess.Popen(
+            '%s /VERYSILENT' % installerFilepath,
             stdout = sys.stdout, cwd = os.path.dirname(installerFilepath)
         )
         setupProc.wait()
 
         # 确认结果并输出提示信息表示压缩结束
-        return (setupProc.returncode == 0 and self.__isInnoSetupInstalled())
+        return setupProc.returncode == 0 and self.__isInnoSetupInstalled()
 
     def choiceExit(self):
         print('不选择任何一个配置的话, 无法继续工作, 请重试.')
@@ -308,12 +350,12 @@ class LeePublisher:
                 menuItem = [cfgValue['LeeName'], None, cfgKey]
                 menus.append(menuItem)
 
-            configure = self.leeCommon.simpleMenu(
+            configure = self.leeCommon.menu(
                 items = menus,
                 title = '选择生成配置',
                 prompt = '请选择用于生成安装程序的配置',
-                injectClass = self,
-                cancelExec = 'injectClass.choiceExit()',
+                inject = self,
+                cancelExec = 'inject.choiceExit()',
                 withCancel = True,
                 resultMap = setupConfigure
             )
@@ -325,7 +367,7 @@ class LeePublisher:
         title = '确认配置的各个选项值'
         prompt = '是否继续?'
 
-        if not self.leeCommon.simpleConfirm(lines, title, prompt, None, None):
+        if not self.leeCommon.confirm(lines, title, prompt, None, None, None):
             self.leeCommon.exitWithMessage('感谢您的使用, 再见')
 
         return configure

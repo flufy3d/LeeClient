@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os
-from PyLibs import LeeSkilldescriptLua
-from PyLibs import LeeCommon
-from PyLibs import LeeBaseTranslator
+from PyLibs import LeeBaseTranslator, LeeSkilldescriptLua
+
 
 class LeeSkilldescriptTranslator(LeeBaseTranslator):
     def __init__(self):

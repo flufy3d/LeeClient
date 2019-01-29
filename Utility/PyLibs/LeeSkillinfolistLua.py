@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import re
-import os
-import lupa
 import copy
-from lupa import LuaRuntime
+import os
+import re
 from dataclasses import dataclass
+
+from lupa import LuaRuntime
+
 from PyLibs import LeeCommon
+
 
 @dataclass
 class LeeNeedSkillItem:
@@ -257,11 +259,10 @@ class LeeSkillinfolistLua:
         os.makedirs(os.path.dirname(fullSavePath), exist_ok = True)
         luafile = open(fullSavePath, 'w', encoding = 'latin1', newline = '')
         luafile.write(luaContent.replace('\r\r', '\r'))
-        luafile.close
+        luafile.close()
 
     def clear(self):
         self.skillinfolistDict.clear()
-        pass
 
     def items(self):
         return self.skillinfolistDict

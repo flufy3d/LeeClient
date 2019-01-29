@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import re
 import os
-import lupa
-from lupa import LuaRuntime
+import re
 from dataclasses import dataclass
+
+from lupa import LuaRuntime
+
 from PyLibs import LeeCommon
+
 
 @dataclass
 class LeeSkilldescriptSingleItem:

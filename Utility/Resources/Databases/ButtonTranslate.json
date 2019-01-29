@@ -472,8 +472,8 @@
         "Directory": "data/texture/蜡历牢磐其捞胶/",
         "Basename": "esc_001",
         "FilenameMode": "b#a|b|c#False",
-        "StyleFormat": "",
-        "ButtonText": ""
+        "StyleFormat": "10000",
+        "ButtonText": "游戏设置"
     },
     "362d94697b60a3ed5261ffd21ee83668": {
         "Directory": "data/texture/蜡历牢磐其捞胶/",
@@ -591,8 +591,8 @@
         "Directory": "data/texture/蜡历牢磐其捞胶/replay_interface/",
         "Basename": "btn_replay",
         "FilenameMode": "_a#|_a|_b#False",
-        "StyleFormat": "",
-        "ButtonText": ""
+        "StyleFormat": "10000",
+        "ButtonText": "重播"
     },
     "037c52a343a82033eec4f78f45b01afa": {
         "Directory": "data/texture/蜡历牢磐其捞胶/replay_interface/",
@@ -605,8 +605,8 @@
         "Directory": "data/texture/蜡历牢磐其捞胶/replay_interface/",
         "Basename": "btn_selectserver",
         "FilenameMode": "_a#|_a|_b#False",
-        "StyleFormat": "",
-        "ButtonText": ""
+        "StyleFormat": "10000",
+        "ButtonText": "选择服务器"
     },
     "221e7acd678c65a5b8c39e2da7ace2c5": {
         "Directory": "data/texture/蜡历牢磐其捞胶/replay_interface/",

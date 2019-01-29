@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import re
 import os
-import lupa
-from lupa import LuaRuntime
 from dataclasses import dataclass
+
+from lupa import LuaRuntime
+
 from PyLibs import LeeCommon
+
 
 @dataclass
 class LeeTowninfoSingleItem:
@@ -88,7 +89,7 @@ end
         os.makedirs(os.path.dirname(fullSavePath), exist_ok = True)
         luafile = open(fullSavePath, 'w', encoding = 'latin1', newline = '')
         luafile.write(luaContent.replace('\r\r', '\r'))
-        luafile.close
+        luafile.close()
 
     def clear(self):
         self.towninfoDict.clear()
@@ -101,4 +102,3 @@ end
             for taginfo in self.towninfoDict[mapname]:
                 if taginfo.tagname == oldname_latin1:
                     taginfo.tagname = newname_latin1
-

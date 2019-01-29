@@ -9,22 +9,13 @@ import timeit
 
 from PyLibs import LeeCommon, LeeIteminfoLua
 
-
-class LeeVerifier:
+class LeeStructParser:
     '''
-    这个类主要实现了对 RO 常用客户端文件格式的简单解析
-    目的用于验证客户端的文件是否完整
+    这个操作类不对外开放, 仅在本文件中被 LeeVerifier 使用
+    它负责将各种不同文件格式中所需要的图档路径信息提取出来, 并以数组方式返回
     '''
     def __init__(self):
         self.leeCommon = LeeCommon()
-        self.textureDirs = ['data/texture']
-        self.modelDirs = ['data/model']
-        self.spriteDirs = ['data/sprite']
-
-        self.reportInfo = []
-        self.reportStartTime = 0    # 用于记录当前检测项目的启动时间
-        self.reportFileCount = 0    # 记录本次检测项目中, 丢失了资源的文件数量
-        self.reportMissCount = 0    # 记录本次检测项目中, 累计丢失的资源文件数量
 
     def __bytesToString(self, bytesArray, targetCode = 'gbk'):
         '''
@@ -66,7 +57,7 @@ class LeeVerifier:
         # ShowDebug('Major %d | Minor %d | Version %d' % (Major, Minor, Version))
         return Major, Minor, Version
 
-    def __parseGnd(self, gndfilepath):
+    def parseGndFile(self, gndfilepath):
         '''
         读取 GND 文件, 并获取它所有相关的贴图地址
         读取到的贴图地址相对于 data/texture/ 目录, 如: data/texture/BACKSIDE.BMP
@@ -79,25 +70,30 @@ class LeeVerifier:
         '''
         if not self.leeCommon.isFileExists(gndfilepath):
             print('读取 Gnd 文件失败, 文件不存在: %s' % gndfilepath)
-            return False, []
+            return False, None
 
-        gndfile = open(gndfilepath, "rb")
-        gndfile.seek(len(b'GRGN\x01\x07')) # Magic Bytes
+        try:
+            gndfile = open(gndfilepath, "rb")
+            gndfile.seek(len(b'GRGN\x01\x07')) # Magic Bytes
 
-        _Width, _Height, _Ratio, TextureCount, TextureSize = struct.unpack("5I", gndfile.read(struct.calcsize("5I")))
-        # ShowDebug("parseGnd_GetTexturePathList: Width %d | Height %d | Ratio %d | TextureCount %d | TextureSize %d" % (_Width, _Height, _Ratio, TextureCount, TextureSize))
+            _Width, _Height, _Ratio, TextureCount, TextureSize = struct.unpack("5I", gndfile.read(struct.calcsize("5I")))
+            # ShowDebug("parseGnd_GetTexturePathList: Width %d | Height %d | Ratio %d | TextureCount %d | TextureSize %d" % (_Width, _Height, _Ratio, TextureCount, TextureSize))
 
-        texturePathList = []
-        for _i in range(TextureCount):
-            fmt = "%ds" % TextureSize
-            TexturePath = struct.unpack(fmt, gndfile.read(struct.calcsize(fmt)))[0]
-            texturePathList.append(self.__bytesToString(TexturePath))
-            # print(self.__bytesToString(TexturePath))
+            texturePathList = []
+            for _i in range(TextureCount):
+                fmt = "%ds" % TextureSize
+                TexturePath = struct.unpack(fmt, gndfile.read(struct.calcsize(fmt)))[0]
+                texturePathList.append(self.__bytesToString(TexturePath))
+                # print(self.__bytesToString(TexturePath))
 
-        gndfile.close()
+            gndfile.close()
+        except Exception as _err:
+            print('处理 gnd 文件时出错了: %s' % gndfilepath)
+            raise
+
         return True, texturePathList
 
-    def __parseRsw(self, rswfilepath):
+    def parseRswFile(self, rswfilepath):
         '''
         读取 RSW 文件, 并获取它所有相关的 RSM 模型地址
         读取到的模型地址相对于 data/model/ 目录, 如: data/model/malaya/龋荐唱公03.rsm
@@ -113,7 +109,7 @@ class LeeVerifier:
         '''
         if not self.leeCommon.isFileExists(rswfilepath):
             print('读取 Rsw 文件失败, 文件不存在: %s' % rswfilepath)
-            return False, []
+            return False, None
 
         rswfile = open(rswfilepath, 'rb')
         rswfile.seek(len(b'GRSW'))     # Magic Bytes
@@ -204,7 +200,7 @@ class LeeVerifier:
         rswfile.close()
         return True, modelPathList
 
-    def __parseRsm(self, rsmfilepath):
+    def parseRsmFile(self, rsmfilepath):
         '''
         读取 RSM 文件, 并获取它所有相关的贴图地址
         读取到的贴图地址相对于 data/texture/ 目录, 如: data/texture/eclage/ecl_obj15.bmp
@@ -227,7 +223,7 @@ class LeeVerifier:
         try:
             if not self.leeCommon.isFileExists(rsmfilepath):
                 print("读取 Rsm 文件失败, 文件不存在: %s" % rsmfilepath)
-                return False, []
+                return False, None
 
             rsmfile = open(rsmfilepath, "rb")
             rsmfile.seek(len(b'GRSM')) # Magic Bytes
@@ -250,7 +246,7 @@ class LeeVerifier:
 
         return True, texturePathList
 
-    def __parseStr(self, strfilepath):
+    def parseStrFile(self, strfilepath):
         '''
         读取 STR 文件, 并获取它所有相关的贴图地址
         读取到的贴图地址相对于 STR 文件所在目录, 如: data/texture/effect/magnus/ff.bmp
@@ -266,7 +262,7 @@ class LeeVerifier:
         '''
         if not self.leeCommon.isFileExists(strfilepath):
             print("读取 Str 文件失败, 文件不存在: %s" % strfilepath)
-            return False, []
+            return False, None
 
         strfile = open(strfilepath, "rb")
         strfile.seek(len(b'STRM')) # Magic Bytes
@@ -286,10 +282,23 @@ class LeeVerifier:
         strfile.close()
         return True, texturePathList
 
-    def __parseIteminfo(self, iteminfofilepath):
+    def parseIteminfo(self, iteminfofilepath):
+        '''
+        读取 iteminfo 文件, 并获取它所有相关的贴图和 ACT&SPR 图档地址
+
+        Args:
+            strfilepath: iteminfo 文件的路径
+
+        Returns:
+            此函数包括三个返回值, 需要使用多个变量来接收函数返回的内容
+
+            result: Boolean 执行成功与否
+            texturePathList: List 保存着贴图文件路径的数组, 相对于 data/texture/ 目录
+            spritePathList: List 保存着 ACT&SPR 图档路径的数组, 相对于 data/sprite/ 目录
+        '''
         if not self.leeCommon.isFileExists(iteminfofilepath):
             print("读取 Iteminfo 文件失败, 文件不存在: %s" % iteminfofilepath)
-            return False, [], []
+            return False, None, None
 
         itemLua = LeeIteminfoLua()
         itemLua.load(iteminfofilepath)
@@ -317,8 +326,25 @@ class LeeVerifier:
 
         return True, texturePathList, spritePathList
 
+
+class LeeVerifier:
+    '''
+    此操作类用于验证客户端的文件是否完整
+    '''
+    def __init__(self):
+        self.leeCommon = LeeCommon()
+        self.leeParser = LeeStructParser()
+        self.textureDirs = ['data/texture']
+        self.modelDirs = ['data/model']
+        self.spriteDirs = ['data/sprite']
+
+        self.reportInfo = []
+        self.reportStartTime = 0    # 用于记录当前检测项目的启动时间
+        self.reportFileCount = 0    # 记录本次检测项目中, 丢失了资源的文件数量
+        self.reportMissCount = 0    # 记录本次检测项目中, 累计丢失的资源文件数量
+
     def __verifyGnd(self, gndfilepath, priorityDataDir = None):
-        result, texturePathList = self.__parseGnd(gndfilepath)
+        result, texturePathList = self.leeParser.parseGndFile(gndfilepath)
         if not result:
             return None, None
 
@@ -349,7 +375,7 @@ class LeeVerifier:
         return existsTexturePathList, missTexturePathList
 
     def __verifyRsw(self, rswfilepath, priorityDataDir = None):
-        result, modelPathList = self.__parseRsw(rswfilepath)
+        result, modelPathList = self.leeParser.parseRswFile(rswfilepath)
         if not result:
             return None, None
 
@@ -375,13 +401,13 @@ class LeeVerifier:
                     existsModelPathList.append(fullpath)
                     break
             else:
-                print('missModelPathList: %s' % modelPath)
+                # print('missModelPathList: %s' % modelPath)
                 missModelPathList.append(fullpath)
 
         return existsModelPathList, missModelPathList
 
     def __verifyRsm(self, rsmfilepath, priorityDataDir = None):
-        result, texturePathList = self.__parseRsm(rsmfilepath)
+        result, texturePathList = self.leeParser.parseRsmFile(rsmfilepath)
         if not result:
             return None, None
 
@@ -412,7 +438,7 @@ class LeeVerifier:
         return existsTexturePathList, missTexturePathList
 
     def __verifyStr(self, strfilepath, priorityDataDir = None):
-        result, texturePathList = self.__parseStr(strfilepath)
+        result, texturePathList = self.leeParser.parseStrFile(strfilepath)
         if not result:
             return None, None
         texturePathList = list(set(texturePathList))    # 文件名消重(str解析出来重复的图档文件名太多)
@@ -477,7 +503,7 @@ class LeeVerifier:
         return existsTexturePathList, missTexturePathList
 
     def __verifyIteminfo(self, iteminfofilepath, priorityDataDir = None):
-        result, texturePathList, spritePathList = self.__parseIteminfo(iteminfofilepath)
+        result, texturePathList, spritePathList = self.leeParser.parseIteminfo(iteminfofilepath)
         if not result:
             return None, None
 
@@ -680,7 +706,7 @@ class LeeVerifier:
             filesinfo = self.__getFilesInfo(
                 glob_or_re = 'glob',
                 reWalkDir = None,
-                pattern = '%s/data/*.gnd' % leeClientDir,
+                pattern = '%s/data/*.gnd' % leeClientDir[:-1],
                 baseDir_or_reGroupID = None,
                 baseDir_append = None
             ),
@@ -698,7 +724,7 @@ class LeeVerifier:
             filesinfo = self.__getFilesInfo(
                 glob_or_re = 'glob',
                 reWalkDir = None,
-                pattern = '%s/data/*.rsw' % leeClientDir,
+                pattern = '%s/data/*.rsw' % leeClientDir[:-1],
                 baseDir_or_reGroupID = None,
                 baseDir_append = None
             ),

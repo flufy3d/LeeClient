@@ -8,11 +8,14 @@ import sys
 from functools import partial
 
 import chardet
+from colorama import Back, Fore, Style, init
 
 from PyLibs import LeeConstant
 
 if platform.system() == 'Windows':
     import winreg
+
+init(convert=(True if platform.system() == 'Windows' else None), autoreset=False)
 
 class LeeCommon:
     '''
@@ -21,7 +24,36 @@ class LeeCommon:
     '''
     def __init__(self):
         self.leeConstant = LeeConstant()
-        self.__cutup_len = 64
+        self.__cutup_len = 78
+        self.__smcut_len = int(self.__cutup_len / 2)
+
+    def welcome(self):
+        LINE_NORMAL = Back.RED + Style.BRIGHT
+        LINE_GREENS = Back.RED + Style.BRIGHT + Fore.GREEN
+        LINE_WHITED = Back.RED + Style.BRIGHT + Fore.WHITE
+        LINE_ENDING = '\033[K' + Style.RESET_ALL
+
+        print('')
+        print(LINE_NORMAL + r'                                                                              ' + LINE_ENDING)
+        print(LINE_WHITED + r'                           rAthenaCN Dev Team Presents                        ' + LINE_ENDING)
+        print(LINE_NORMAL + r'                _                  ____  _  _               _                 ' + LINE_ENDING)
+        print(LINE_NORMAL + r'               | |     ___   ___  / ___|| |(_)  ___  _ __  | |_               ' + LINE_ENDING)
+        print(LINE_NORMAL + r'               | |    / _ \ / _ \| |    | || | / _ \| \'_ \ | __|             ' + LINE_ENDING)
+        print(LINE_NORMAL + r'               | |___|  __/|  __/| |___ | || ||  __/| | | || |_               ' + LINE_ENDING)
+        print(LINE_NORMAL + r'               |_____|\___| \___| \____||_||_| \___||_| |_| \__|              ' + LINE_ENDING)
+        print(LINE_NORMAL + r'                                                                              ' + LINE_ENDING)
+        print(LINE_GREENS + r'                https://github.com/cairolee/rAthenaCN_LeeClient               ' + LINE_ENDING)
+        print(LINE_NORMAL + r'                                                                              ' + LINE_ENDING)
+        print(LINE_WHITED + r'             LeeClient is only for learning and research purposes.            ' + LINE_ENDING)
+        print(LINE_WHITED +  '                      Please don\'t use it for commercial.                    ' + LINE_ENDING)
+        print(LINE_NORMAL + r'                                                                              ' + LINE_ENDING)
+        print('')
+
+    def printSmallCutLine(self):
+        print('-' * self.__smcut_len)
+
+    def printFullCutLine(self):
+        print('=' * self.__cutup_len)
 
     def verifyAgentLocation(self):
         '''
@@ -49,7 +81,8 @@ class LeeCommon:
                 verifyPassFlag = False
 
         # 任何一个不通过, 都认为脚本所处的位置不正确
-        return verifyPassFlag
+        if not verifyPassFlag:
+            self.exitWithMessage('LeeClientAgent 所处的位置不正确, 拒绝执行')
 
     def removeEmptyDirectorys(self, folderpath):
         '''
@@ -280,18 +313,18 @@ class LeeCommon:
         '''
         用于清理终端的屏幕 (Win下测试过, Linux上没测试过)
         '''
-        sysstr = platform.system()
-        if sysstr == 'Windows':
+        if platform.system() == 'Windows':
             os.system('cls')
         else:
             os.system('clear')
+
+        self.welcome()
 
     def pauseScreen(self):
         '''
         如果在 Win 平台下的话, 输出一个 pause 指令
         '''
-        sysstr = platform.system()
-        if sysstr == 'Windows':
+        if platform.system() == 'Windows':
             os.system('pause')
 
     def exitWithMessage(self, message):
@@ -435,16 +468,12 @@ class LeeCommon:
         utf8_length = len(val.encode('utf-8'))
         return int((utf8_length - length)/2 + length)
 
-    def simpleConfirm(self, lines, title, prompt, menus, evalcmd):
+    def confirm(self, lines, title, prompt, inject, cancelExec, evalcmd):
         '''
         简易的确认对话框
         '''
-        self.cleanScreen()
         if not title is None:
-            titleFmt = '= %s%-' + str(60 - self.getStringWidthLen(title)) + 's ='
-            print('=' * self.__cutup_len)
-            print(titleFmt % (title, ''))
-            print('=' * self.__cutup_len)
+            print(title)
 
         print('')
 
@@ -452,56 +481,53 @@ class LeeCommon:
             print(line)
 
         print('')
-        print('=' * self.__cutup_len)
-        print('')
         user_select = input(prompt + ' [Y/N]: ')
+        print('')
+        self.printSmallCutLine()
         print('')
 
         if user_select in ('N', 'n'):
-            if menus is not None:
-                menus.item_End()
-            elif evalcmd is None:
-                return False
+            if cancelExec is not None:
+                exec(cancelExec)
+            return False
         elif user_select in ('Y', 'y'):
             if evalcmd is not None:
                 exec(evalcmd)
-            elif evalcmd is None:
-                return True
+            return True
         else:
             self.exitWithMessage('请填写 Y 或者 N 之后回车确认, 请不要输入其他字符')
 
-    def simpleMenu(self, items, title, prompt, withCancel = False,
-                   injectClass = None, cancelExec = None, resultMap = None):
+    def menu(self, items, title, prompt = None, withCancel = False,
+             inject = None, cancelExec = None, resultMap = None):
         '''
         简易的选择菜单
         '''
-        self.cleanScreen()
+        if prompt is None:
+            prompt = '请填写想要执行的菜单编号, 然后按回车确定'
+
         if not title is None:
-            titleFmt = '= %s%-' + str(60 - self.getStringWidthLen(title)) + 's ='
-            print('=' * self.__cutup_len)
-            print(titleFmt % (title, ''))
-            print('=' * self.__cutup_len)
+            print(title)
 
         print('')
 
-        index = 0
+        index = 1
         menuIndexAndResultIndexDict = {}
         for item in items:
             print('%d - %s' % (index, item[0]))
-            menuIndexAndResultIndexDict[index] = None if item[2] is None else item[2]
+            menuIndexAndResultIndexDict[index] = None if len(item) <= 2 or item[2] is None else item[2]
             index = index + 1
         if withCancel:
             print('%d - %s' % (index, '取消'))
         print('')
-        print('=' * self.__cutup_len)
-        print('')
         userSelect = input('%s (%d - %d): ' % (prompt, 0, len(items) - 1))
+        print('')
+        self.printSmallCutLine()
         print('')
 
         if (not self.atoi(userSelect) and userSelect != '0'):
             self.exitWithMessage('请填写正确的菜单编号(纯数字), 不要填写其他字符')
 
-        userSelect = self.atoi(userSelect)
+        userSelect = self.atoi(userSelect) - 1
 
         if (userSelect == len(items) and withCancel):
             if cancelExec is not None:
@@ -523,22 +549,22 @@ class LeeCommon:
             return resultMap[menuIndexAndResultIndexDict[userSelect]]
         return None
 
-    def simpleInput(self, lines, title, prompt, menus, evalcmd):
+    def input(self, lines, title, prompt, inject, evalcmd):
         '''
         简易的确认对话框
         '''
         self.cleanScreen()
         if not title is None:
             titleFmt = '= %s%-' + str(60 - self.getStringWidthLen(title)) + 's ='
-            print('=' * self.__cutup_len)
+            self.printFullCutLine()
             print(titleFmt % (title, ''))
-            print('=' * self.__cutup_len)
+            self.printFullCutLine()
 
         for line in lines:
             print(line)
 
         print('')
-        print('=' * self.__cutup_len)
+        self.printFullCutLine()
         print('')
         user_input = input(prompt + ': ')
         print('')
