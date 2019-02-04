@@ -456,7 +456,7 @@ class LeeCommon(LeePath):
         if withCancel:
             print('%d - %s' % (index, '取消'))
         print('')
-        userSelect = input('%s (%d - %d): ' % (prompt, 0, len(items) - 1))
+        userSelect = input('%s (%d - %d): ' % (prompt, 1, len(items) + 1 if withCancel else len(items)))
         print('')
         self.printSmallCutLine()
         print('')
