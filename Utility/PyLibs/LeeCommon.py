@@ -90,54 +90,6 @@ class LeeCommon(LeePath):
             if not os.listdir(dirpath):
                 os.rmdir(dirpath)
 
-    def getBeforePatchesDirectory(self, isImport = False):
-        '''
-        获取通用的 BeforePatches 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        baseDirname = 'Import' if isImport else 'Patches'
-        return os.path.abspath('%s/%s/Common/BeforePatches' % (scriptDir, baseDirname)) + os.sep
-
-    def getAfterPatchesDirectory(self, isImport = False):
-        '''
-        获取通用的 AfterPatches 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        baseDirname = 'Import' if isImport else 'Patches'
-        return os.path.abspath('%s/%s/Common/AfterPatches' % (scriptDir, baseDirname)) + os.sep
-
-    def getClientBuildDirectory(self, clientver):
-        '''
-        获取客户端版本的 Build 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        return os.path.abspath('%s/Patches/%s/Ragexe/Build' % (scriptDir, clientver)) + os.sep
-
-    def getClientOriginDirectory(self, clientver):
-        '''
-        获取客户端版本的 Original 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        return os.path.abspath(
-            '%s/Patches/%s/Resource/Original' % (scriptDir, clientver)
-        ) + os.sep
-
-    def getClientTranslatedDirectory(self, clientver):
-        '''
-        获取客户端版本的 Translated 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        return os.path.abspath(
-            '%s/Patches/%s/Resource/Translated' % (scriptDir, clientver)
-        ) + os.sep
-
-    def getClientImportDirectory(self, clientver):
-        '''
-        获取客户端版本的 Import 目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.utility(withmark=False)
-        return os.path.abspath('%s/Import/%s' % (scriptDir, clientver)) + os.sep
-
     def normpath(self, path):
         '''
         改进版本的 os.path.normpath 会自动根据系统调整路径
@@ -422,7 +374,9 @@ class LeeCommon(LeePath):
         对用于描述一个路径的正则表达式中的斜杆进行处理
         以便在 Linux 或者 Win 平台上都能兼容
         '''
-        return rePattern.replace('/', r'\\' if os.path.sep == '\\' else '/')
+        return rePattern.replace(
+            '/', r'\\' if os.path.sep == '\\' else '/'
+        )
 
     def strHexToRgb(self, val):
         '''
@@ -432,7 +386,7 @@ class LeeCommon(LeePath):
         lv = len(val)
         return tuple(int(val[i:i+lv//3], 16) for i in range(0, lv, lv//3))
 
-    def is_positive(self, z):
+    def isPositive(self, z):
         '''
         判断一个数字是否为正整数
         '''

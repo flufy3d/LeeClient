@@ -208,10 +208,10 @@ class LeeButtonRender:
             ).split(',')[1])
             boardWidth = imgForeText.size[0] + abs(shadowOffsetX)
             boardHeight = imgForeText.size[1] + abs(shadowOffsetY)
-            foreOffsetX = 0 if self.leeCommon.is_positive(shadowOffsetX) else abs(shadowOffsetX)
-            foreOffsetY = 0 if self.leeCommon.is_positive(shadowOffsetY) else abs(shadowOffsetY)
-            shadowOffsetX = 0 if not self.leeCommon.is_positive(shadowOffsetX) else shadowOffsetX
-            shadowOffsetY = 0 if not self.leeCommon.is_positive(shadowOffsetY) else shadowOffsetY
+            foreOffsetX = 0 if self.leeCommon.isPositive(shadowOffsetX) else abs(shadowOffsetX)
+            foreOffsetY = 0 if self.leeCommon.isPositive(shadowOffsetY) else abs(shadowOffsetY)
+            shadowOffsetX = 0 if not self.leeCommon.isPositive(shadowOffsetX) else shadowOffsetX
+            shadowOffsetY = 0 if not self.leeCommon.isPositive(shadowOffsetY) else shadowOffsetY
 
             imgMergeText = Image.new('RGBA', (boardWidth, boardHeight), (0,0,0,0))
             imgMergeText.paste(imgBackText, (shadowOffsetX, shadowOffsetY))

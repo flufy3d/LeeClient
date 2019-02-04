@@ -236,15 +236,15 @@ class LeePatchManager:
         if not clientver in clientList:
             self.leeCommon.exitWithMessage('您期望切换的版本号 %s 是无效的' % clientver)
 
-        beforeDir = self.leeCommon.getBeforePatchesDirectory()
-        ragexeDir = self.leeCommon.getClientBuildDirectory(clientver)
-        clientOriginDir = self.leeCommon.getClientOriginDirectory(clientver)
-        clientTranslatedDir = self.leeCommon.getClientTranslatedDirectory(clientver)
-        afterDir = self.leeCommon.getAfterPatchesDirectory()
+        beforeDir = self.leeCommon.special(None, 'patches_before')
+        ragexeDir = self.leeCommon.special(clientver, 'build')
+        clientOriginDir = self.leeCommon.special(clientver, 'origin')
+        clientTranslatedDir = self.leeCommon.special(clientver, 'translated')
+        afterDir = self.leeCommon.special(None, 'patches_after')
 
-        importBeforeDir = self.leeCommon.getBeforePatchesDirectory(True)
-        importClientDir = self.leeCommon.getClientImportDirectory(clientver)
-        importAftertDir = self.leeCommon.getAfterPatchesDirectory(True)
+        importBeforeDir = self.leeCommon.special(None, 'import_before')
+        importClientDir = self.leeCommon.special(clientver, 'import_version')
+        importAftertDir = self.leeCommon.special(None, 'import_after')
 
         # 确认对应的资源目录在是存在的
         if not self.leeCommon.isDirectoryExists(beforeDir):

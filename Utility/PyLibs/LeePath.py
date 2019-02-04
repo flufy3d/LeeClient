@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 
 class LeePath:
     def __init__(self):
@@ -48,9 +49,35 @@ class LeePath:
         path = os.path.join(path, relpath)
         return self.__withmark(os.path.abspath(path), withmark)
 
-    # beforePatches
-    # afterPatches
-
-    # clientOrigin
-    # clientTranslate
-    # clientImport
+    def special(self, clientver, dirtype, relpath = '', withmark = True):
+        if dirtype == 'origin':
+            path = '{ver}/Resource/Original'.format(ver=clientver)
+            operater = self.patches
+        elif dirtype == 'translated':
+            path = '{ver}/Resource/Translated'.format(ver=clientver)
+            operater = self.patches
+        elif dirtype == 'build':
+            path = '{ver}/Ragexe/Build'.format(ver=clientver)
+            operater = self.patches
+        elif dirtype == 'import_version':
+            path = '{ver}'.format(ver=clientver)
+            operater = self.imports
+        elif dirtype == 'import_before':
+            path = 'Common/BeforePatches'
+            operater = self.imports
+        elif dirtype == 'import_after':
+            path = 'Common/AfterPatches'
+            operater = self.imports
+        elif dirtype == 'patches_before':
+            path = 'Common/BeforePatches'
+            operater = self.patches
+        elif dirtype == 'patches_after':
+            path = 'Common/AfterPatches'
+            operater = self.patches
+        else:
+            print('LeePath: special 函数中 dirtype 参数的值无效.')
+            sys.exit(-1)
+        
+        path = operater(path, False)
+        path = os.path.join(path, relpath)
+        return self.__withmark(os.path.abspath(path), withmark)
