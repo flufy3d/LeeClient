@@ -259,6 +259,13 @@ class LeeMenu:
             evalcmd='inject.menufuncUpdateButtonTranslateDB()'
         )
 
+    def menuitemStatisticsTranslateCoverage(self):
+        '''
+        菜单处理函数
+        当选择“进行一些开发者维护工作 -> 汉化管理 - 汉化覆盖率统计”时执行
+        '''
+        self.leeCommon.exitWithMessage('此功能目前还在规划中, 待实现...')
+
     def menuitemClientResourceVerifier(self):
         '''
         菜单处理函数
@@ -494,6 +501,7 @@ class LeeMenu:
         self.leeCommon.menu(
             [
                 ['汉化管理 - 更新按钮汉化数据库', 'inject.menuitemUpdateButtonTranslateDB()'],
+                ['汉化管理 - 汉化覆盖率统计（计划实现）', 'inject.menuitemStatisticsTranslateCoverage()'],
                 ['资源管理 - 校验客户端资源完整性', 'inject.menuitemClientResourceVerifier()'],
                 ['脚本管理 - 批量反编译某个目录中的 lub 文件', 'inject.menuitemBatchDecompileLub()'],
                 ['脚本管理 - 批量整理某个目录中的 lub 文件', 'inject.menuitemBatchAmendmentsLub()'],
