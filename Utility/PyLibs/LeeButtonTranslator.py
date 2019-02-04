@@ -102,7 +102,7 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
             for filename in filenames:
                 if not filename.lower().endswith('.bmp'):
                     continue
-                if dirpath.lower().find('resource/original') <= 0:
+                if dirpath.lower().find('resource%soriginal' % os.sep) <= 0:
                     continue
 
                 fullpath = '%s/%s' % (dirpath, filename)
@@ -112,10 +112,11 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
 
                 relpath = re.search(self.leeCommon.normPattern(r'Original/(.*)$'), fullpath).group(1)
                 fullNameMode = '%s#%s#%s' % (referPostfix, filenameMode, withDisabled)
-                translateKey = self.__generateKey(os.path.dirname(relpath).lower() + os.path.sep, '%s%s' % (realBasename, referPostfix))
+                baseDirectory = (os.path.dirname(relpath).lower() + os.path.sep).replace('\\', '/')
+                translateKey = self.__generateKey(baseDirectory, '%s%s' % (realBasename, referPostfix))
 
                 translateItem = {
-                    'Directory': os.path.dirname(relpath).lower() + os.path.sep,
+                    'Directory': baseDirectory,
                     'Basename': realBasename,
                     'FilenameMode': fullNameMode,
                     'StyleFormat': '' if not (translateKey in self.translateMap) else self.translateMap[translateKey]['StyleFormat'],

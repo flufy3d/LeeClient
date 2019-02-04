@@ -38,7 +38,7 @@ class LeeBaseTranslator:
             translateDBPath = self.translateDefaultDBPath
         savePath = self.leeCommon.utility(translateDBPath)
         json.dump(
-            self.translateMap, open(savePath, 'w', encoding = 'utf-8'),
+            self.translateMap, open(savePath, 'w', encoding = 'utf-8', newline = '\n'),
             indent = 4, ensure_ascii = False
         )
         return True
