@@ -231,7 +231,8 @@ class LeePublisher:
         判断 Inno Setup 是否已经安装到电脑中
         '''
         innoSetupDir = self.__getInnoSetupInstallPath()
-        if innoSetupDir is None: return False
+        if innoSetupDir is None:
+            return False
         return self.leeCommon.isFileExists('%sCompil32.exe' % innoSetupDir)
 
     def __getInnoSetupInstallPath(self):
@@ -272,7 +273,8 @@ class LeePublisher:
         scriptDir = self.leeCommon.getScriptDirectory()
         innoSetupDir = self.__getInnoSetupInstallPath()
 
-        if innoSetupDir is None: return False
+        if innoSetupDir is None:
+            return False
 
         srcFilepath = ('%sBin/InnoSetup/Resources/Installer/SetupLdr.e32' % scriptDir).replace('/', os.path.sep)
         dstFilepath = ('%sSetupLdr.e32' % innoSetupDir)
@@ -281,7 +283,8 @@ class LeePublisher:
         if (not self.leeCommon.isFileExists(bakFilepath)) and self.leeCommon.isFileExists(dstFilepath):
             shutil.copyfile(dstFilepath, bakFilepath)
 
-        if not self.leeCommon.isFileExists(srcFilepath): return False
+        if not self.leeCommon.isFileExists(srcFilepath):
+            return False
         os.remove(dstFilepath)
         shutil.copyfile(srcFilepath, dstFilepath)
 
