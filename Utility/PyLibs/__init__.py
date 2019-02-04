@@ -2,7 +2,6 @@
 
 __author__ = "CairoLee"
 
-from .LeeConstant import LeeConstant
 from .LeeCommon import LeeCommon
 from .LeeConfigure import LeeConfigure
 from .LeePatchManager import LeePatchManager

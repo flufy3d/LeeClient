@@ -10,8 +10,6 @@ from functools import partial
 import chardet
 from colorama import Back, Fore, Style, init
 
-from PyLibs import LeeConstant
-
 if platform.system() == 'Windows':
     import winreg
 
@@ -23,7 +21,6 @@ class LeeCommon:
     此类中的任何一个方法都可以被独立使用, 无需依赖
     '''
     def __init__(self):
-        self.leeConstant = LeeConstant()
         self.__cutup_len = 78
         self.__smcut_len = int(self.__cutup_len / 2)
 

@@ -4,14 +4,10 @@
 import os
 import timeit
 
-from PyLibs import (LeeButtonTranslator, LeeCommon, LeeConstant,
-                    LeeIteminfoTranslator, LeeLua, LeePatchManager,
-                    LeePublisher, LeeSkilldescriptTranslator,
-                    LeeSkillinfolistTranslator, LeeTowninfoTranslator,
-                    LeeVerifier)
-
-LeeConstant().Environment = 'develop'
-LeeConstant().EncodingForSaveFile = 'utf-8'
+from PyLibs import (LeeButtonTranslator, LeeCommon, LeeIteminfoTranslator,
+                    LeeLua, LeePatchManager, LeePublisher,
+                    LeeSkilldescriptTranslator, LeeSkillinfolistTranslator,
+                    LeeTowninfoTranslator, LeeVerifier)
 
 # ==============================================================================
 # 类的定义和实现
