@@ -10,12 +10,14 @@ from functools import partial
 import chardet
 from colorama import Back, Fore, Style, init
 
+from PyLibs import LeePath
+
 if platform.system() == 'Windows':
     import winreg
 
 init(convert=(True if platform.system() == 'Windows' else None), autoreset=False)
 
-class LeeCommon:
+class LeeCommon(LeePath):
     '''
     这个类用来存放一些通用的函数
     此类中的任何一个方法都可以被独立使用, 无需依赖
@@ -56,8 +58,7 @@ class LeeCommon:
         '''
         用于验证此脚本是否处于正确的运行位置
         '''
-        scriptDir = self.getScriptDirectory()
-        leeClientDir = self.getLeeClientDirectory()
+        scriptDir = self.utility()
         verifyPassFlag = True
 
         # 切换工作目录为脚本所在目录
@@ -72,8 +73,8 @@ class LeeCommon:
 
         # 检查脚本所在的上级目录中, 是否存在特定的文件
         verifyFileList = ['cps.dll', 'aossdk.dll']
-        for file in verifyFileList:
-            verifyPath = (os.path.abspath(leeClientDir + file))
+        for item in verifyFileList:
+            verifyPath = (os.path.abspath(self.client() + item))
             if not (os.path.isfile(verifyPath) and os.path.exists(verifyPath)):
                 verifyPassFlag = False
 
@@ -96,13 +97,6 @@ class LeeCommon:
         return os.path.abspath(
             os.path.join(os.path.split(os.path.realpath(__file__))[0], '..')
         ) + os.sep
-
-    def getLeeClientDirectory(self):
-        '''
-        获取 LeeClient 的主目录 (末尾自动补充斜杠)
-        '''
-        scriptDir = self.getScriptDirectory()
-        return os.path.abspath(os.path.join(scriptDir, '..')) + os.sep
 
     def getBeforePatchesDirectory(self, isImport = False):
         '''

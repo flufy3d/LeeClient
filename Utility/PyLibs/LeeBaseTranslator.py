@@ -46,7 +46,7 @@ class LeeBaseTranslator:
         return True
 
     def doTranslate(self, specifiedClientVer = None):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client()
         scriptDir = self.leeCommon.getScriptDirectory()
         patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
 

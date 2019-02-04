@@ -15,8 +15,8 @@ class LeeGrf:
         self.patchManager = LeePatchManager()
     
     def isGrfExists(self):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
-        grfFiles = glob.glob('%s/*.grf' % leeClientDir[:-1])
+        leeClientDir = self.leeCommon.client(withmark=False)
+        grfFiles = glob.glob('%s/*.grf' % leeClientDir)
         return len(grfFiles) > 0
 
     def makeGrf(self, dataDirpath, grfOutputPath):

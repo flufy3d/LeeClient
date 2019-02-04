@@ -21,14 +21,14 @@ class LeePublisher:
         self.patchManager = LeePatchManager()
     
     def removeOldGrf(self):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
-        grfFiles = glob.glob('%s/*.grf' % leeClientDir[:-1])
+        leeClientDir = self.leeCommon.client(withmark=False)
+        grfFiles = glob.glob('%s/*.grf' % leeClientDir)
 
         for filepath in grfFiles:
             os.remove(filepath)
 
     def ensureHasGRF(self):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         if LeeGrf().isGrfExists():            
             reUseExistsGrfFiles = self.leeCommon.confirm(
@@ -48,7 +48,7 @@ class LeePublisher:
             if reUseExistsGrfFiles:
                 return
         
-        LeeGrf().makeGrf('%sdata' % leeClientDir, '%sdata.grf' % leeClientDir)
+        LeeGrf().makeGrf('%s/data' % leeClientDir, '%s/data.grf' % leeClientDir)
 
         if not LeeGrf().isGrfExists():
             self.leeCommon.exitWithMessage('请先将 data 目录打包为 Grf 文件, 以便提高文件系统的复制效率.')       
@@ -57,7 +57,7 @@ class LeePublisher:
         '''
         将 LeeClient 的内容复制到打包源目录(并删除多余文件)
         '''
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         # 判断是否已经切换到某个客户端版本
         if not self.patchManager.canRevert():
@@ -75,10 +75,7 @@ class LeePublisher:
         # 生成一个 LeeClient 平级的发布目录
         nowTime = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         releaseDirName = 'LeeClient_Release_%s' % nowTime
-        releaseDirpath = '%s%s%s%s' % (
-            os.path.abspath('%s../' % leeClientDir), os.path.sep,
-            releaseDirName, os.path.sep
-        )
+        releaseDirpath = self.leeCommon.client('../' + releaseDirName)
 
         # 先列出需要复制到打包源的文件列表
         filterDirectories = ['Utility', '.git', '.vscode']
@@ -88,15 +85,16 @@ class LeePublisher:
         if useGrf:
             filterDirectories.append('data')
 
+        print('正在分析需要复制的文件, 请稍后...')
         copyFileList = []
-        for dirpath, _dirnames, filenames in os.walk(os.path.join(leeClientDir, leeClientDir)):
+        for dirpath, _dirnames, filenames in os.walk(leeClientDir):
             for filename in filenames:
                 fullpath = os.path.join(dirpath, filename)
 
                 # 过滤一下不需要导出的目录
                 isBlocked = False
                 for filterDir in filterDirectories:
-                    if ('%s%s%s' % (leeClientDir, filterDir, os.path.sep)).lower() in fullpath.lower():
+                    if os.path.join(leeClientDir, filterDir).lower() in dirpath.lower():
                         isBlocked = True
                         break
                 if isBlocked:
@@ -105,7 +103,7 @@ class LeePublisher:
                 # 过滤一下不需要导出的文件
                 isBlocked = False
                 for filterFile in filterFiles:
-                    if ('%s%s' % (leeClientDir, filterFile)).lower() in fullpath.lower():
+                    if filterFile.lower() in filename.lower():
                         isBlocked = True
                         break
                 if isBlocked:
@@ -114,6 +112,7 @@ class LeePublisher:
                 # 记录到 copyFileList 表示需要复制此文件到打包源
                 copyFileList.append(fullpath)
 
+        print('分析完毕, 共需复制 %d 个文件, 马上开始.' % len(copyFileList))
         # 把文件拷贝到打包源
         # TODO: 最好能够显示文件的复制进度
         # http://zzq635.blog.163.com/blog/static/1952644862013125112025129/

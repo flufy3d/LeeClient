@@ -101,7 +101,7 @@ class LeePatchManager:
 
     def __commitSession(self):
         scriptDir = self.leeCommon.getScriptDirectory()
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
         backupDir = os.path.abspath('%s/Patches/Backup' % scriptDir)
 
         try:
@@ -171,7 +171,7 @@ class LeePatchManager:
 
     def canRevert(self):
         self.__loadSession()
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client()
 
         restoreFileInfo = []
 
@@ -191,7 +191,7 @@ class LeePatchManager:
         if loadSession:
             self.__loadSession()
 
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
         scriptDir = self.leeCommon.getScriptDirectory()
         backupDir = os.path.abspath('%s/Patches/Backup' % scriptDir)
         sessionInfoFile = self.__getSessionPath()
@@ -205,7 +205,7 @@ class LeePatchManager:
 
         # 删除一些需要强制移除的目录
         for folder in self.forceRemoveDirs:
-            for dirpath, _dirnames, filenames in os.walk(os.path.join(leeClientDir, folder)):
+            for dirpath, _dirnames, filenames in os.walk(self.leeCommon.client(folder)):
                 for filename in filenames:
                     fullpath = os.path.join(dirpath, filename)
                     if os.path.exists(fullpath) and os.path.isfile(fullpath):

@@ -24,7 +24,7 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
         因为翻译按钮时的文件遍历方式与翻译其他单个文件的遍历方式有所不同
         '''
         self.__updateRevertDefaultDBPath(specifiedClientVer)
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client()
         scriptDir = self.leeCommon.getScriptDirectory()
         patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
         rePathPattern = self.leeCommon.normPattern(r'^.*?/Patches/.*?/Resource/Original/data/texture/蜡历牢磐其捞胶')

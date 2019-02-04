@@ -350,7 +350,7 @@ class LeeVerifier:
 
         missTexturePathList = []
         existsTexturePathList = []
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         for texturePath in texturePathList:
             if priorityDataDir:
@@ -381,7 +381,7 @@ class LeeVerifier:
 
         missModelPathList = []
         existsModelPathList = []
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         for modelPath in modelPathList:
             if priorityDataDir:
@@ -413,7 +413,7 @@ class LeeVerifier:
 
         missTexturePathList = []
         existsTexturePathList = []
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         for texturePath in texturePathList:
             if priorityDataDir:
@@ -446,7 +446,7 @@ class LeeVerifier:
         missTexturePathList = []
         existsTexturePathList = []
 
-        leeClientDir = self.leeCommon.getLeeClientDirectory()[:-1]
+        leeClientDir = self.leeCommon.client(withmark=False)
         leeClientCommonDataDir = '%s/data' % leeClientDir
         isPatchStrFile = leeClientCommonDataDir.lower() not in strfilepath.lower()
 
@@ -507,7 +507,7 @@ class LeeVerifier:
         if not result:
             return None, None
 
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         missTexturePathList = []
         for texturePath in texturePathList:
@@ -572,7 +572,7 @@ class LeeVerifier:
             self.reportInfo.append('')
 
     def __appendReportData(self, sourceFile, missFilesList):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client()
         relSourceFile = os.path.relpath(sourceFile, leeClientDir)
 
         missFileCount = 0
@@ -607,7 +607,6 @@ class LeeVerifier:
 
     def __saveReport(self):
         reportTime = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
         savePath = '%s/Reports/VerifyRpt_%s.txt' % (self.leeCommon.getScriptDirectory(), reportTime)
         savePath = self.leeCommon.normpath(savePath)
         os.makedirs(os.path.dirname(savePath), exist_ok = True)
@@ -615,7 +614,7 @@ class LeeVerifier:
         rptfile = open(savePath, 'w+', encoding = 'utf-8', newline = '')
         rptfile.write('\r\n'.join(self.reportInfo))
 
-        print('校验结果已保存到 : %s' % os.path.relpath(savePath, leeClientDir))
+        print('校验结果已保存到 : %s' % os.path.relpath(savePath, self.leeCommon.client()))
 
     def __getFilesInfo(self, glob_or_re, reWalkDir, pattern, baseDir_or_reGroupID,
                        baseDir_append = None):
@@ -695,7 +694,7 @@ class LeeVerifier:
         return parsefuncResult[returnPathListIndex]
 
     def __globalResourceVerifier(self):
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
+        leeClientDir = self.leeCommon.client(withmark=False)
 
         # 校验公用目录中地图文件所需的图档文件
         # =====================================================================
@@ -706,7 +705,7 @@ class LeeVerifier:
             filesinfo = self.__getFilesInfo(
                 glob_or_re = 'glob',
                 reWalkDir = None,
-                pattern = '%s/data/*.gnd' % leeClientDir[:-1],
+                pattern = '%s/data/*.gnd' % leeClientDir,
                 baseDir_or_reGroupID = None,
                 baseDir_append = None
             ),
@@ -724,7 +723,7 @@ class LeeVerifier:
             filesinfo = self.__getFilesInfo(
                 glob_or_re = 'glob',
                 reWalkDir = None,
-                pattern = '%s/data/*.rsw' % leeClientDir[:-1],
+                pattern = '%s/data/*.rsw' % leeClientDir,
                 baseDir_or_reGroupID = None,
                 baseDir_append = None
             ),

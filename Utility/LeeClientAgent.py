@@ -32,9 +32,9 @@ class LeeMenu:
             print('正在重置其他客户端资源 ...')
             self.patchManager.doRevertPatch()
 
-            leeClientDir = self.leeCommon.getLeeClientDirectory()
-            if self.leeCommon.isFileExists('%sdata.grf' % leeClientDir):
-                os.remove('%sdata.grf' % leeClientDir)
+            leeClientDir = self.leeCommon.client(withmark=False)
+            if self.leeCommon.isFileExists('%s/data.grf' % leeClientDir):
+                os.remove('%s/data.grf' % leeClientDir)
 
             print('正在删除空目录 ...')
             self.leeCommon.removeEmptyDirectorys(leeClientDir)
@@ -89,8 +89,7 @@ class LeeMenu:
         '''
         将指定的打包源压缩成一个 ZIP 文件
         '''
-        leeClientParantDir = '%s..%s' % (self.leeCommon.getLeeClientDirectory(), os.path.sep)
-        leeClientParantDir = os.path.abspath(leeClientParantDir)
+        leeClientParantDir = self.leeCommon.client('..')
         packageSourceDirpath = '%s%s%s' % (leeClientParantDir, os.path.sep, packageSourceDirname)
 
         zipFilename = LeePublisher().getZipFilename(packageSourceDirpath)
@@ -103,8 +102,7 @@ class LeeMenu:
         '''
         将指定的打包源制作成一个 Setup 安装程序
         '''
-        leeClientParantDir = '%s..%s' % (self.leeCommon.getLeeClientDirectory(), os.path.sep)
-        leeClientParantDir = os.path.abspath(leeClientParantDir)
+        leeClientParantDir = self.leeCommon.client('..')
         packageSourceDirpath = '%s%s%s' % (leeClientParantDir, os.path.sep, packageSourceDirname)
         outputDirpath = './Output/%s' % packageSourceDirname
 
@@ -395,9 +393,8 @@ class LeeMenu:
         菜单处理函数
         当选择“生成 / 打包 / 制作客户端安装程 -> 选择一个打包源, 压缩成 ZIP 包”时执行
         '''
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
         packageSourceDirnameList = LeePublisher().getPackageSourceList(
-            os.path.abspath(leeClientDir + '..' + os.path.sep) + os.sep
+            self.leeCommon.client('..')
         )
         if packageSourceDirnameList is None:
             self.leeCommon.exitWithMessage('很抱歉, 无法获取打包源列表, 程序终止')
@@ -422,9 +419,8 @@ class LeeMenu:
         菜单处理函数
         当选择“生成 / 打包 / 制作客户端安装程 -> 选择一个打包源, 制作游戏安装程序”时执行
         '''
-        leeClientDir = self.leeCommon.getLeeClientDirectory()
         packageSourceDirnameList = LeePublisher().getPackageSourceList(
-            os.path.abspath(leeClientDir + '..' + os.sep) + os.sep
+            self.leeCommon.client('..')
         )
         if packageSourceDirnameList is None:
             self.leeCommon.exitWithMessage('很抱歉, 无法获取打包源列表, 程序终止')
