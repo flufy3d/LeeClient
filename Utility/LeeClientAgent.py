@@ -58,7 +58,7 @@ class LeeMenu:
                 prompt='是否立刻执行重置操作?',
                 inject=self,
                 cancelExec='inject.menuitemExitAgent()',
-                evalcmd='inject.resetWorkshop()'
+                evalcmd='inject.menufuncResetWorkshop()'
             )
             print('----------------------------------------------------------------')
 
