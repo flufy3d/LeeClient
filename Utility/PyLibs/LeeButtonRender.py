@@ -243,18 +243,16 @@ class LeeButtonRender:
             return imgFinalText
 
     def getButtonTemplatePath(self, tplName, btnState, piece):
-        scriptDir = self.leeCommon.getScriptDirectory()
         return os.path.abspath('%s/Resources/Texture/Button/Style_%s/%s_%s.png' % (
-            scriptDir, tplName, btnState, piece
+            self.leeCommon.utility(withmark=False), tplName, btnState, piece
         ))
 
     def getFontPath(self, fontFilename):
         if fontFilename in self.fontPathMap:
             return self.fontPathMap[fontFilename]
 
-        scriptDir = self.leeCommon.getScriptDirectory()
         fontOriginPath = os.path.abspath('%s/Resources/Fonts/%s' % (
-            scriptDir, fontFilename
+            self.leeCommon.utility(withmark=False), fontFilename
         ))
 
         # 把字体文件复制到系统临时目录, 以便确保路径没有任何中文
@@ -272,8 +270,11 @@ class LeeButtonRender:
         return imgsize
 
     def __loadButtonConfigure(self, tplName):
-        scriptDir = self.leeCommon.getScriptDirectory()
-        configurePath = '%s/Resources/Texture/Button/Style_%s/configure.json' % (scriptDir, tplName)
+        configurePath = (
+            '%s/Resources/Texture/Button/Style_%s/configure.json' % (
+                self.leeCommon.utility(withmark=False), tplName
+            )
+        )
         return (
             json.load(open(configurePath, 'r'))
             if self.leeCommon.isFileExists(configurePath) else None

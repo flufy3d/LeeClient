@@ -67,7 +67,7 @@ class LeePublisher:
             self.ensureHasGRF()
 
         # 判断磁盘的剩余空间是否足够
-        currentDriver = self.leeCommon.getScriptDirectory()[0]
+        currentDriver = self.leeCommon.utility()[0]
         currentFreeSpace = self.leeCommon.getDiskFreeSpace(currentDriver)
         if currentFreeSpace <= 1024 * 1024 * 1024 * 4:
             self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 4 GB, 请清理磁盘释放更多空间.' % currentDriver)
@@ -269,13 +269,13 @@ class LeePublisher:
         '''
         # TODO: 此过程要求管理员权限, 看看如何检测一下
 
-        scriptDir = self.leeCommon.getScriptDirectory()
+        scriptDir = self.leeCommon.utility(withmark=False)
         innoSetupDir = self.__getInnoSetupInstallPath()
 
         if innoSetupDir is None:
             return False
 
-        srcFilepath = ('%sBin/InnoSetup/Resources/Installer/SetupLdr.e32' % scriptDir).replace('/', os.path.sep)
+        srcFilepath = ('%s/Bin/InnoSetup/Resources/Installer/SetupLdr.e32' % scriptDir).replace('/', os.path.sep)
         dstFilepath = ('%sSetupLdr.e32' % innoSetupDir)
         bakFilepath = ('%sSetupLdr.e32.bak' % innoSetupDir)
 
@@ -319,8 +319,10 @@ class LeePublisher:
         # TODO: 此过程要求管理员权限, 看看如何检测一下
 
         # 先确认 Inno Setup 的安装程序是否存在
-        scriptDir = self.leeCommon.getScriptDirectory()
-        installerFilepath = ('%sBin/InnoSetup/Resources/Installer/innosetup-5.6.1-unicode.exe' % scriptDir).replace('/', os.path.sep)
+        scriptDir = self.leeCommon.utility(withmark=False)
+        installerFilepath = (
+            '%s/Bin/InnoSetup/Resources/Installer/innosetup-5.6.1-unicode.exe' % scriptDir
+        ).replace('/', os.path.sep)
         if not self.leeCommon.isFileExists(installerFilepath):
             return False
 
@@ -405,9 +407,9 @@ class LeePublisher:
         '''
         获取 Inno Setup 的脚本模板并作为字符串返回
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
+        scriptDir = self.leeCommon.utility(withmark=False)
         scriptTemplateFilepath = (
-            '%sBin/InnoSetup/Resources/Scripts/Scripts_Template.iss' % scriptDir
+            '%s/Bin/InnoSetup/Resources/Scripts/Scripts_Template.iss' % scriptDir
         ).replace('/', os.path.sep)
 
         if not self.leeCommon.isFileExists(scriptTemplateFilepath):
@@ -437,8 +439,8 @@ class LeePublisher:
         '''
         将给定的最终脚本内容保存到一个临时目录中, 并返回脚本的全路径
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        scriptCacheDir = ('%sBin/InnoSetup/Cache/' % scriptDir).replace('/', os.path.sep)
+        scriptDir = self.leeCommon.utility(withmark=False)
+        scriptCacheDir = ('%s/Bin/InnoSetup/Cache/' % scriptDir).replace('/', os.path.sep)
         os.makedirs(scriptCacheDir, exist_ok = True)
 
         contentHash = self.leeCommon.getMD5ForString(finallyContent)

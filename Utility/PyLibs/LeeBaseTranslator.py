@@ -23,7 +23,7 @@ class LeeBaseTranslator:
         self.clear()
         if translateDBPath is None:
             translateDBPath = self.translateDefaultDBPath
-        translatePath = '%s/%s' % (self.leeCommon.getScriptDirectory(), translateDBPath)
+        translatePath = '%s/%s' % (self.leeCommon.utility(withmark=False), translateDBPath)
         if not self.leeCommon.isFileExists(translatePath):
             return False
         try:
@@ -36,9 +36,7 @@ class LeeBaseTranslator:
     def save(self, translateDBPath = None):
         if translateDBPath is None:
             translateDBPath = self.translateDefaultDBPath
-        scriptDir = self.leeCommon.getScriptDirectory()
-
-        savePath = os.path.abspath('%s/%s' % (scriptDir, translateDBPath))
+        savePath = self.leeCommon.utility(translateDBPath)
         json.dump(
             self.translateMap, open(savePath, 'w', encoding = 'utf-8'),
             indent = 4, ensure_ascii = False
@@ -47,8 +45,7 @@ class LeeBaseTranslator:
 
     def doTranslate(self, specifiedClientVer = None):
         leeClientDir = self.leeCommon.client()
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
 
         if self.reSrcPathPattern is None:
             return False

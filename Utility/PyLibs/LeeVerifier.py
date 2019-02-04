@@ -607,7 +607,9 @@ class LeeVerifier:
 
     def __saveReport(self):
         reportTime = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        savePath = '%s/Reports/VerifyRpt_%s.txt' % (self.leeCommon.getScriptDirectory(), reportTime)
+        savePath = '%s/Reports/VerifyRpt_%s.txt' % (
+            self.leeCommon.utility(withmark=False), reportTime
+        )
         savePath = self.leeCommon.normpath(savePath)
         os.makedirs(os.path.dirname(savePath), exist_ok = True)
 
@@ -793,8 +795,7 @@ class LeeVerifier:
         )
 
     def __patchesResourceVerifier(self):
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
 
         # 校验各个补丁目录中地图文件所需的图档文件
         # =====================================================================

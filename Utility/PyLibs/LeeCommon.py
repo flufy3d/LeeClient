@@ -90,19 +90,11 @@ class LeeCommon(LeePath):
             if not os.listdir(dirpath):
                 os.rmdir(dirpath)
 
-    def getScriptDirectory(self):
-        '''
-        获取当前脚本所在的上级目录位置 (末尾自动补充斜杠)
-        '''
-        return os.path.abspath(
-            os.path.join(os.path.split(os.path.realpath(__file__))[0], '..')
-        ) + os.sep
-
     def getBeforePatchesDirectory(self, isImport = False):
         '''
         获取通用的 BeforePatches 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         baseDirname = 'Import' if isImport else 'Patches'
         return os.path.abspath('%s/%s/Common/BeforePatches' % (scriptDir, baseDirname)) + os.sep
 
@@ -110,7 +102,7 @@ class LeeCommon(LeePath):
         '''
         获取通用的 AfterPatches 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         baseDirname = 'Import' if isImport else 'Patches'
         return os.path.abspath('%s/%s/Common/AfterPatches' % (scriptDir, baseDirname)) + os.sep
 
@@ -118,14 +110,14 @@ class LeeCommon(LeePath):
         '''
         获取客户端版本的 Build 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         return os.path.abspath('%s/Patches/%s/Ragexe/Build' % (scriptDir, clientver)) + os.sep
 
     def getClientOriginDirectory(self, clientver):
         '''
         获取客户端版本的 Original 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         return os.path.abspath(
             '%s/Patches/%s/Resource/Original' % (scriptDir, clientver)
         ) + os.sep
@@ -134,7 +126,7 @@ class LeeCommon(LeePath):
         '''
         获取客户端版本的 Translated 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         return os.path.abspath(
             '%s/Patches/%s/Resource/Translated' % (scriptDir, clientver)
         ) + os.sep
@@ -143,7 +135,7 @@ class LeeCommon(LeePath):
         '''
         获取客户端版本的 Import 目录 (末尾自动补充斜杠)
         '''
-        scriptDir = self.getScriptDirectory()
+        scriptDir = self.utility(withmark=False)
         return os.path.abspath('%s/Import/%s' % (scriptDir, clientver)) + os.sep
 
     def normpath(self, path):

@@ -25,8 +25,7 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
         '''
         self.__updateRevertDefaultDBPath(specifiedClientVer)
         leeClientDir = self.leeCommon.client()
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
         rePathPattern = self.leeCommon.normPattern(r'^.*?/Patches/.*?/Resource/Original/data/texture/蜡历牢磐其捞胶')
         self.load()
         self.clearRevert()
@@ -96,11 +95,10 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
         self.saveRevert()
 
     def update(self):
-        scriptDir = self.leeCommon.getScriptDirectory()
-        ragexeClientDir = os.path.normpath('%s/Patches' % scriptDir)
+        patchesDir = self.leeCommon.patches(withmark=False)
         updTranslateMap = {}
 
-        for dirpath, _dirnames, filenames in os.walk(ragexeClientDir):
+        for dirpath, _dirnames, filenames in os.walk(patchesDir):
             for filename in filenames:
                 if not filename.lower().endswith('.bmp'):
                     continue
@@ -131,8 +129,8 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
 
     def doRevert(self, specifiedClientVer = None):
         if specifiedClientVer == 'AllVersions':
-            scriptDir = self.leeCommon.getScriptDirectory()
-            for filepath in glob.glob('%sResources/Databases/RevertData/LeeButtonRevert*.json' % scriptDir):
+            scriptDir = self.leeCommon.utility(withmark=False)
+            for filepath in glob.glob('%s/Resources/Databases/RevertData/LeeButtonRevert*.json' % scriptDir):
                 relpath = os.path.relpath(filepath, scriptDir)
                 LeeBaseRevert.doRevert(self, relpath)
         else:

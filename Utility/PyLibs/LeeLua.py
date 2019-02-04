@@ -160,8 +160,8 @@ class LeeLua:
             )
 
         # 确认 GrfCL 文件存在
-        scriptDir = self.leeCommon.getScriptDirectory()
-        self.grfCLFilepath = ('%sBin/GrfCL/GrfCL.exe' % scriptDir).replace('/', os.path.sep)
+        scriptDir = self.leeCommon.utility(withmark=False)
+        self.grfCLFilepath = ('%s/Bin/GrfCL/GrfCL.exe' % scriptDir).replace('/', os.path.sep)
         if not self.leeCommon.isFileExists(self.grfCLFilepath):
             self.leeCommon.exitWithMessage('反编译 lub 文件所需的 GrfCL.exe 程序不存在, 无法执行反编译.')
 

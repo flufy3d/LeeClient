@@ -19,7 +19,7 @@ class LeeBaseRevert:
         if revertDatabaseLoadpath is None:
             revertDatabaseLoadpath = self.revertDefaultDBPath
         revertDatabaseLoadpath = '%s/%s' % (
-            self.leeCommon.getScriptDirectory(), revertDatabaseLoadpath
+            self.leeCommon.utility(withmark=False), revertDatabaseLoadpath
         )
         if not self.leeCommon.isFileExists(revertDatabaseLoadpath):
             return False
@@ -33,14 +33,14 @@ class LeeBaseRevert:
         return True
 
     def rememberRevert(self, filepath):
-        patchesDir = os.path.normpath('%s/Patches/' % self.leeCommon.getScriptDirectory())
+        patchesDir = self.leeCommon.patches()
         self.revertFiles.append(os.path.relpath(filepath, patchesDir).replace('/', '\\'))
 
     def saveRevert(self, revertDatabaseSavepath = None):
         if revertDatabaseSavepath is None:
             revertDatabaseSavepath = self.revertDefaultDBPath
         revertDatabaseSavepath = '%s/%s' % (
-            self.leeCommon.getScriptDirectory(), revertDatabaseSavepath
+            self.leeCommon.utility(withmark=False), revertDatabaseSavepath
         )
         if self.leeCommon.isFileExists(revertDatabaseSavepath):
             os.remove(revertDatabaseSavepath)
@@ -64,8 +64,7 @@ class LeeBaseRevert:
             revertDatabaseLoadpath = self.revertDefaultDBPath
         self.loadRevert(revertDatabaseLoadpath)
 
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
 
         for relpath in self.revertFiles:
             # replace('\\', os.path.sep) 标准化处理一下反斜杠

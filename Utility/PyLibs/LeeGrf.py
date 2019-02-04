@@ -36,14 +36,14 @@ class LeeGrf:
             self.leeCommon.exitWithMessage('请先将 LeeClient 切换到某个客户端版本, 以便制作出来的 grf 文件内容完整.')
 
         # 确认有足够的磁盘剩余空间进行压缩
-        currentDriver = self.leeCommon.getScriptDirectory()[0]
+        currentDriver = self.leeCommon.utility()[0]
         currentFreeSpace = self.leeCommon.getDiskFreeSpace(currentDriver)
         if currentFreeSpace <= 1024 * 1024 * 1024 * 3:
             self.leeCommon.exitWithMessage('磁盘 %s: 的空间不足 3GB, 请清理磁盘释放更多空间.' % currentDriver)
 
         # 确认 GrfCL 文件存在
-        scriptDir = self.leeCommon.getScriptDirectory()
-        grfCLFilepath = ('%sBin/GrfCL/GrfCL.exe' % scriptDir).replace('/', os.path.sep)
+        scriptDir = self.leeCommon.utility(withmark=False)
+        grfCLFilepath = ('%s/Bin/GrfCL/GrfCL.exe' % scriptDir).replace('/', os.path.sep)
         if not self.leeCommon.isFileExists(grfCLFilepath):
             self.leeCommon.exitWithMessage('制作 grf 文件所需的 GrfCL.exe 程序不存在, 无法执行压缩.')
 

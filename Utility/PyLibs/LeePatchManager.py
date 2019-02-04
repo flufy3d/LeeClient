@@ -35,8 +35,7 @@ class LeePatchManager:
         '''
         获取最后一次应用补丁时，路径信息数据库的存储路径
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        revertDir = os.path.abspath('%s/Resources/Databases/RevertData' % scriptDir)
+        revertDir = self.leeCommon.resources('Databases/RevertData')
         os.makedirs(revertDir, exist_ok = True)
         sessionInfoFile = os.path.abspath('%s/LeeClientRevert.json' % revertDir)
         return sessionInfoFile
@@ -86,7 +85,7 @@ class LeePatchManager:
         return False
 
     def __copyDirectory(self, srcDirectory):
-        scriptDir = self.leeCommon.getScriptDirectory()
+        scriptDir = self.leeCommon.utility()
         useless_files = ['thumbs.db', '.ds_store', '.gitignore', '.gitkeep']
 
         # 复制文件，且记录所有可能会应用的目的地址
@@ -100,9 +99,9 @@ class LeePatchManager:
                 self.stagingFiles.append({'src' : srcrel_path, 'dst' : dstrel_path})
 
     def __commitSession(self):
-        scriptDir = self.leeCommon.getScriptDirectory()
+        scriptDir = self.leeCommon.utility(withmark=False)
         leeClientDir = self.leeCommon.client(withmark=False)
-        backupDir = os.path.abspath('%s/Patches/Backup' % scriptDir)
+        backupDir = self.leeCommon.patches('Backup')
 
         try:
             # 确保来源文件都存在
@@ -192,8 +191,7 @@ class LeePatchManager:
             self.__loadSession()
 
         leeClientDir = self.leeCommon.client(withmark=False)
-        scriptDir = self.leeCommon.getScriptDirectory()
-        backupDir = os.path.abspath('%s/Patches/Backup' % scriptDir)
+        backupDir = self.leeCommon.patches('Backup')
         sessionInfoFile = self.__getSessionPath()
 
         # 删除之前应用的文件
@@ -231,9 +229,8 @@ class LeePatchManager:
         '''
         应用特定版本的补丁
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
         clientList = self.leeCommon.getRagexeClientList(
-            os.path.abspath(scriptDir + 'Patches') + os.sep
+            self.leeCommon.patches()
         )
 
         if not clientver in clientList:

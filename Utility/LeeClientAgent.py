@@ -160,8 +160,7 @@ class LeeMenu:
         '''
         将 Patches 目录下的 lub 文件批量进行整理
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
 
         for dirpath, _dirnames, filenames in os.walk(patchesDir):
             for filename in filenames:
@@ -180,8 +179,7 @@ class LeeMenu:
         扫描整个 Patches 目录下的 lub 文件
         检测他们的是否已经被反编译, 并将没有被反编译的 lub 文件列出
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
 
         print('正在扫描, 可能会花几分钟时间, 请耐心等待...')
         print('')
@@ -208,8 +206,7 @@ class LeeMenu:
         扫描整个 Patches 目录下的 lub 文件
         检测他们的文件编码, 并列出非 ANSI 编码的文件
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        patchesDir = os.path.normpath('%s/Patches/' % scriptDir)
+        patchesDir = self.leeCommon.patches()
         allowANSI = [
             'ASCII', 'EUC-KR', 'LATIN1', 'GBK',
             'GB2312', 'CP949', 'ISO-8859-1', 'WINDOWS-1252'
@@ -445,10 +442,7 @@ class LeeMenu:
         菜单处理函数
         当选择“切换客户端到指定版本”时执行
         '''
-        scriptDir = self.leeCommon.getScriptDirectory()
-        clientList = self.leeCommon.getRagexeClientList(
-            os.path.abspath(scriptDir + 'Patches') + os.sep
-        )
+        clientList = self.leeCommon.getRagexeClientList(self.leeCommon.patches())
         if clientList is None:
             self.leeCommon.exitWithMessage('很抱歉, 无法获取客户端版本列表, 程序终止')
 
