@@ -232,6 +232,23 @@ class LeeCommon(LeePath):
         dirlist.sort()
         return dirlist
 
+    def replaceBasename(self, filepath, filename):
+        '''
+        替换 filepath 中的文件名为 filename 并返回
+        '''
+        dirname = os.path.dirname(filepath)
+        return '%s/%s' % (dirname, filename)
+    
+    def isAdministrator(self):
+        '''
+        判断当前用户是否拥有管理员权限
+        '''
+        try:
+            is_admin = (os.getuid() == 0)
+        except AttributeError:
+            is_admin = (ctypes.windll.shell32.IsUserAnAdmin() != 0)
+        return is_admin
+
     def getMD5ForString(self, strContent):
         '''
         获取一段字符串内容的 MD5 值

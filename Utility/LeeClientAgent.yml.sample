@@ -1,3 +1,16 @@
+PackageSource:
+  # 是否自动移除"调试版"的登录器主程序 (如果有)?
+  AutoRemoveDebugClient: true
+
+  # 打包之前, 哪个程序文件是启动游戏的入口?
+  # 若保持默认选项: auto 的话, 会自动选择"正常版"的登录器.
+  # 若您没有使用 Import 目录来导入自己的游戏主程序, 那么这里可以不用动.
+  SourceClientName: auto
+
+  # 启动游戏的入口程序在生成打包源的时候会被重命名什么?
+  # 若填写: None 的话, 则程序在打包时不会进行任何重命名操作
+  # 除了 None 这个特殊值外, 打包时会把 SourceClientName 指定的文件进行重命名
+  PublishClientName: LeeClient.exe
 
 ZipConfigure:
   # 当选择把打包源制作成 zip 压缩包时, 可以使用此选项调整压缩包内的顶级目录名称
@@ -22,7 +35,7 @@ SetupConfigure: [
     LeeAppName: LeeClient,
 
     # 游戏的主程序, 可以是客户端, 也可以是更新器
-    LeeAppExeName: 2017-06-14bRagexeRE_patched.exe,
+    LeeAppExeName: LeeClient.exe,
 
     # 即将制作的安装包的版本号信息, 每次打包后都会自动递增最后一节
     LeeAppVersion: 1.0.1,

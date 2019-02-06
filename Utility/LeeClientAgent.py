@@ -89,8 +89,8 @@ class LeeMenu:
         '''
         将指定的打包源压缩成一个 ZIP 文件
         '''
-        leeClientParantDir = self.leeCommon.client('..')
-        packageSourceDirpath = '%s%s%s' % (leeClientParantDir, os.path.sep, packageSourceDirname)
+        leeClientParantDir = self.leeCommon.client('..', withmark=False)
+        packageSourceDirpath = '%s/%s' % (leeClientParantDir, packageSourceDirname)
 
         zipFilename = LeePublisher().getZipFilename(packageSourceDirpath)
         if not LeePublisher().makeZip(packageSourceDirpath, zipFilename):
@@ -102,8 +102,8 @@ class LeeMenu:
         '''
         将指定的打包源制作成一个 Setup 安装程序
         '''
-        leeClientParantDir = self.leeCommon.client('..')
-        packageSourceDirpath = '%s%s%s' % (leeClientParantDir, os.path.sep, packageSourceDirname)
+        leeClientParantDir = self.leeCommon.client('..', withmark=False)
+        packageSourceDirpath = '%s/%s' % (leeClientParantDir, packageSourceDirname)
         outputDirpath = './Output/%s' % packageSourceDirname
 
         if not LeePublisher().makeSetup(packageSourceDirpath, outputDirpath):

@@ -18,6 +18,7 @@ if platform.system() == 'Windows':
 class LeePublisher:
     def __init__(self):
         self.leeCommon = LeeCommon()
+        self.leeConfig = LeeConfigure()
         self.patchManager = LeePatchManager()
     
     def removeOldGrf(self):
@@ -58,6 +59,7 @@ class LeePublisher:
         将 LeeClient 的内容复制到打包源目录(并删除多余文件)
         '''
         leeClientDir = self.leeCommon.client(withmark=False)
+        packageSourceCfg = self.leeConfig.get('PackageSource')
 
         # 判断是否已经切换到某个客户端版本
         if not self.patchManager.canRevert():
@@ -75,7 +77,7 @@ class LeePublisher:
         # 生成一个 LeeClient 平级的发布目录
         nowTime = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         releaseDirName = 'LeeClient_Release_%s' % nowTime
-        releaseDirpath = self.leeCommon.client('../' + releaseDirName)
+        releaseDirpath = self.leeCommon.client('../' + releaseDirName, withmark=False)
 
         # 先列出需要复制到打包源的文件列表
         filterDirectories = ['Utility', '.git', '.vscode']
@@ -94,7 +96,7 @@ class LeePublisher:
                 # 过滤一下不需要导出的目录 (大小写敏感)
                 dirnames[:] = [d for d in dirnames if d not in filterDirectories]
 
-                # 过滤一下不需要导出的文件
+                # 过滤一下不需要导出的文件 (不区分大小写)
                 isBlocked = False
                 for filterFile in filterFiles:
                     if filterFile.lower() in filename.lower():
@@ -102,19 +104,51 @@ class LeePublisher:
                         break
                 if isBlocked:
                     continue
+                
+                # 判断是否需要移除调试版的登录器主程序
+                if filename.lower().endswith('.exe') and '_ReportError.exe' in filename:
+                    if packageSourceCfg['AutoRemoveDebugClient']:
+                        continue
 
                 # 记录到 copyFileList 表示需要复制此文件到打包源
                 copyFileList.append(fullpath)
 
         print('分析完毕, 共需复制 %d 个文件, 马上开始.' % len(copyFileList))
+
+        # 确定游戏启动入口的相对路径
+        srcClientName = packageSourceCfg['SourceClientName']
+        pubClientName = packageSourceCfg['PublishClientName']
+
+        if packageSourceCfg['SourceClientName'] == 'auto':
+            for srcFilepath in copyFileList:
+                if not srcFilepath.lower().endswith('.exe'):
+                    continue
+                filename = os.path.basename(srcFilepath)
+                if '_patched.exe' in filename:
+                    srcClientName = filename
+                    break
+
         # 把文件拷贝到打包源
-        # TODO: 最好能够显示文件的复制进度
-        # http://zzq635.blog.163.com/blog/static/1952644862013125112025129/
+            # TODO: 最好能够显示文件的复制进度
+            # http://zzq635.blog.163.com/blog/static/1952644862013125112025129/
         for srcFilepath in copyFileList:
+            # 获取相对路径, 用于复制到目标文件时使用
             relFilepath = os.path.relpath(srcFilepath, leeClientDir)
-            dstFilepath = '%s%s' % (releaseDirpath, relFilepath)
-            print('正在复制: %s' % relFilepath)
-            os.makedirs(os.path.dirname(dstFilepath), exist_ok = True)
+
+            # 构建复制到的目标文件全路径
+            dstFilepath = '%s/%s' % (releaseDirpath, relFilepath)
+
+            # 对游戏的入口程序进行重命名操作
+            bIsSourceClient = False
+            if srcFilepath.lower().endswith('.exe'):
+                if os.path.basename(srcFilepath) == srcClientName:
+                    bIsSourceClient = True
+                    dstFilepath = self.leeCommon.replaceBasename(dstFilepath, pubClientName)
+
+            print('正在复制: %s%s' % (
+                relFilepath, ' (%s)' % pubClientName if bIsSourceClient else ''
+            ))
+            os.makedirs(os.path.dirname(dstFilepath), exist_ok=True)
             shutil.copyfile(srcFilepath, dstFilepath)
 
         # 把最终发布源所在的目录当做参数返回值回传
@@ -149,8 +183,8 @@ class LeePublisher:
         # https://blog.csdn.net/dou_being/article/details/81546172
         # https://blog.csdn.net/zhd199500423/article/details/80853405
 
-        zipConfigure = LeeConfigure().get('ZipConfigure')
-        return LeeZipfile().zip(sourceDir, zipSavePath, zipConfigure['TopLevelDirName'])
+        zipCfg = self.leeConfig.get('ZipConfigure')
+        return LeeZipfile().zip(sourceDir, zipSavePath, zipCfg['TopLevelDirName'])
 
     def makeSetup(self, sourceDir, setupOutputDir = None):
         '''
@@ -261,7 +295,9 @@ class LeePublisher:
         '''
         应用 SetupLdr.e32 补丁到 Inno Setup 的安装目录下 (要求管理员权限)
         '''
-        # TODO: 此过程要求管理员权限, 看看如何检测一下
+        # 此过程要求管理员权限, 看看如何检测一下
+        if not self.leeCommon.isAdministrator():
+            self.leeCommon.exitWithMessage('此操作要求程序“以管理员权限运行”, 请重试.')
 
         scriptDir = self.leeCommon.utility(withmark=False)
         innoSetupDir = self.__getInnoSetupInstallPath()
@@ -310,7 +346,9 @@ class LeePublisher:
         '''
         安装 Inno Setup 并确保安装成功 (要求管理员权限)
         '''
-        # TODO: 此过程要求管理员权限, 看看如何检测一下
+        # 此过程要求管理员权限, 在此进行检查
+        if not self.leeCommon.isAdministrator():
+            self.leeCommon.exitWithMessage('此操作要求程序“以管理员权限运行”, 请重试.')
 
         # 先确认 Inno Setup 的安装程序是否存在
         scriptDir = self.leeCommon.utility(withmark=False)
@@ -338,13 +376,13 @@ class LeePublisher:
         让用户选择一个生成 Setup 的配置
         '''
         # 读取现在的所有 setup 配置
-        setupConfigure = LeeConfigure().get('SetupConfigure')
+        setupCfg = self.leeConfig.get('SetupConfigure')
 
         # 若只有一个配置, 则直接选中这个配置, 进入用户确认阶段
-        if len(setupConfigure) > 1:
+        if len(setupCfg) > 1:
             # 列出来让用户进行选择, 选中哪个就把配置读取出来返回
             menus = []
-            for cfgKey, cfgValue in enumerate(setupConfigure):
+            for cfgKey, cfgValue in enumerate(setupCfg):
                 menuItem = [cfgValue['LeeName'], None, cfgKey]
                 menus.append(menuItem)
 
@@ -355,10 +393,10 @@ class LeePublisher:
                 inject = self,
                 cancelExec = 'inject.choiceExit()',
                 withCancel = True,
-                resultMap = setupConfigure
+                resultMap = setupCfg
             )
         else:
-            configure = setupConfigure[0]
+            configure = setupCfg[0]
 
         # 把配置内容列出来让用户进行最终确认
         lines = self.__getConfigureInfos(configure)
