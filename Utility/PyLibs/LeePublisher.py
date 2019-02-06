@@ -87,18 +87,12 @@ class LeePublisher:
 
         print('正在分析需要复制的文件, 请稍后...')
         copyFileList = []
-        for dirpath, _dirnames, filenames in os.walk(leeClientDir):
+        for dirpath, dirnames, filenames in os.walk(leeClientDir):
             for filename in filenames:
                 fullpath = os.path.join(dirpath, filename)
 
-                # 过滤一下不需要导出的目录
-                isBlocked = False
-                for filterDir in filterDirectories:
-                    if os.path.join(leeClientDir, filterDir).lower() in dirpath.lower():
-                        isBlocked = True
-                        break
-                if isBlocked:
-                    continue
+                # 过滤一下不需要导出的目录 (大小写敏感)
+                dirnames[:] = [d for d in dirnames if d not in filterDirectories]
 
                 # 过滤一下不需要导出的文件
                 isBlocked = False
