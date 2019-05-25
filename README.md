@@ -4,6 +4,14 @@ LeeClient 客户端
 LeeClient 是一个整合仙境传说官方所有图档资源, 方便 GM 切换不同版本客户端进行
 调试和研究的仙境传说完整客户端, 最终可基于 LeeClient 制作出自己的完整客户端.
 
+需要 LFS 支持
+----------------------
+
+本工程大量的二进制文件(图片、图档)都已经存放到了 LFS 中, 克隆本项目之前, 请先
+确保您的 git 环境支持 LFS, 否则克隆到本地的内容可能会不完整.
+
+如何安装 git-lfs 插件请参考相关说明: https://coding.net/git/lfs
+
 使用注意事项
 ----------------------
 
@@ -14,9 +22,6 @@ LeeClient 是一个整合仙境传说官方所有图档资源, 方便 GM 切换�
 > 2. cd 切换到本仓库在您电脑上的路径 (例如：C:\LeeClient)
 > 3. 执行 `git config core.filemode false` 关闭当前仓库的 filemode 检测
 
-需要注意的是从 2019年05月25日 开始, 本工程大量的二进制文件(图片、图档)都已经存放
-到了 LFS 中, 克隆本项目之前, 请先确保您的 git 环境支持 LFS.
-
 国内加速镜像
 ----------------------
 
@@ -24,7 +29,9 @@ LeeClient 是一个整合仙境传说官方所有图档资源, 方便 GM 切换�
 大家能以更快速度将本工程克隆下来, 我们将 LeeClient 克隆到 "腾讯云开发者平台".
 
 当您试图克隆本项目的时候, 可以换用以下指令从"腾讯云"来进行克隆:
-`git clone https://git.dev.tencent.com/cairolee/LeeClient.git`
+```
+git clone https://git.dev.tencent.com/cairolee/LeeClient.git
+```
 
 此项目的待办事项
 ----------------------
