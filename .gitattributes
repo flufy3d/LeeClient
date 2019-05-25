@@ -1,5 +1,8 @@
-*.dll	filter=lfs diff=lfs merge=lfs -text
-*.exe	filter=lfs diff=lfs merge=lfs -text
+# 将以下目录的文件存储到 LFS
 /BGM/**	filter=lfs diff=lfs merge=lfs -text
 /Utility/Patches/*/Resource/**	filter=lfs diff=lfs merge=lfs -text
 /data/**	filter=lfs diff=lfs merge=lfs -text
+
+# 将以下类型的文件存储到 LFS
+*.dll	filter=lfs diff=lfs merge=lfs -text
+*.exe	filter=lfs diff=lfs merge=lfs -text
