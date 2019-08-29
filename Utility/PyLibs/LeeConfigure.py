@@ -16,7 +16,9 @@ class LeeConfigure:
 
     def load(self):
         configureFileFullpath = os.path.abspath(self.configureFilepath)
-        self.configureData = yaml.load(open(configureFileFullpath, 'r', encoding = 'utf-8'))
+        self.configureData = yaml.load(
+            open(configureFileFullpath, 'r', encoding = 'utf-8'), Loader=yaml.FullLoader
+        )
         return self.configureData
 
     def get(self, configPath, _default = None):
