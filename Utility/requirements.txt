@@ -1,7 +1,7 @@
-chardet==3.0.4
-dataclasses==0.6
-lupa==1.8
-colorama==0.4.1
-pygame==1.9.6
-Pillow==6.1.0
-PyYAML==5.1.2
+dataclasses
+lupa
+chardet
+colorama
+pygame
+Pillow
+PyYAML
