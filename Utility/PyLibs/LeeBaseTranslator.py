@@ -71,7 +71,7 @@ class LeeBaseTranslator:
             )
             if match is None:
                 self.leeCommon.exitWithMessage('无法确定翻译后的文件的存放位置, 程序终止')
-            destinationPath = '%s/Translated/%s' % (match.group(1), match.group(2))
+            destinationPath = '%s/Temporary/%s' % (match.group(1), match.group(2))
             self.translate(sourceFilepath, destinationPath)
             print('汉化完毕, 保存到: %s\r\n' % os.path.relpath(destinationPath, leeClientDir))
 

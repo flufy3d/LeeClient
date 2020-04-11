@@ -4,6 +4,7 @@ import ctypes
 import hashlib
 import os
 import platform
+import shutil
 import sys
 from functools import partial
 
@@ -47,6 +48,10 @@ class LeeCommon(LeePath):
         print(LINE_WHITED +  '                      Please don\'t use it for commercial.                    ' + LINE_ENDING)
         print(LINE_NORMAL + r'                                                                              ' + LINE_ENDING)
         print('')
+
+    def removeDirectory(self, dirpath):
+        if os.path.exists(dirpath) and os.path.isdir(dirpath):
+            shutil.rmtree(dirpath, ignore_errors=True)
 
     def printSmallCutLine(self):
         print('-' * self.__smcut_len)

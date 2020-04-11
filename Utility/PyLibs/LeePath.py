@@ -56,6 +56,9 @@ class LeePath:
         elif dirtype == 'translated':
             path = '{ver}/Resource/Translated'.format(ver=clientver)
             operater = self.patches
+        elif dirtype == 'temporary':
+            path = '{ver}/Resource/Temporary'.format(ver=clientver)
+            operater = self.patches
         elif dirtype == 'build':
             path = '{ver}/Ragexe/Build'.format(ver=clientver)
             operater = self.patches

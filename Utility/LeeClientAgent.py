@@ -36,6 +36,12 @@ class LeeMenu:
             if self.leeCommon.isFileExists('%s/data.grf' % leeClientDir):
                 os.remove('%s/data.grf' % leeClientDir)
 
+            # 移除各个 Patches 版本目录中的 Temporary 目录
+            clientList = self.leeCommon.getRagexeClientList(self.leeCommon.patches())
+            for x in clientList:
+                temporaryDir = self.leeCommon.special(x, 'temporary')
+                self.leeCommon.removeDirectory(temporaryDir)
+
             print('正在删除空目录 ...')
             self.leeCommon.removeEmptyDirectorys(leeClientDir)
 

@@ -64,7 +64,7 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
                 translateInfo['FullPath'], re.I
             ).group(1)
 
-            translatedDirpath = resourceDirpath + 'Translated'
+            translatedDirpath = resourceDirpath + 'Temporary'
             textureDirpath = '%s/%s' % (
                 translatedDirpath, os.path.dirname(translateInfo['RelativePath'])
             )
@@ -77,7 +77,7 @@ class LeeButtonTranslator(LeeBaseTranslator, LeeBaseRevert):
 
                 print('正在汉化: %s' % os.path.relpath(
                     btnSavePath, leeClientDir
-                ).replace('Translated', 'Original'))
+                ).replace('Temporary', 'Original'))
 
                 self.leeFileIO.createButtonBmpFile(
                     translateInfo['StyleFormat'],

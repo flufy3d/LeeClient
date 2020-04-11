@@ -240,6 +240,7 @@ class LeePatchManager:
         ragexeDir = self.leeCommon.special(clientver, 'build')
         clientOriginDir = self.leeCommon.special(clientver, 'origin')
         clientTranslatedDir = self.leeCommon.special(clientver, 'translated')
+        clientTemporaryDir = self.leeCommon.special(clientver, 'temporary')
         afterDir = self.leeCommon.special(None, 'patches_after')
 
         importBeforeDir = self.leeCommon.special(None, 'import_before')
@@ -277,6 +278,7 @@ class LeePatchManager:
         self.__copyDirectory(importBeforeDir)        # Import
         self.__copyDirectory(ragexeDir)
         self.__copyDirectory(clientOriginDir)
+        self.__copyDirectory(clientTemporaryDir)
         self.__copyDirectory(clientTranslatedDir)
         self.__copyDirectory(importClientDir)        # Import
         self.__copyDirectory(afterDir)
