@@ -501,7 +501,9 @@ class LeeMenu:
                 ['脚本管理 - 扫描并列出所有非 ANSI 编码的 lub 文件', 'inject.menuitemDetectNonAnsiLub()']
             ],
             title='以下是一些开发者维护工作, 请选择您需要的操作:',
-            inject=self
+            inject=self,
+            cancelExec='inject.entrance()',
+            withCancel=True
         )
 
     def menuitemMakePackageOrSetup(self):
@@ -516,7 +518,9 @@ class LeeMenu:
                 ['选择一个打包源, 制作游戏安装程序 (仅 Windows 平台支持)', 'inject.menuitemPackageSourceToSetup()']
             ],
             title='生成 / 打包 / 制作客户端安装程序, 请选择您需要的操作:',
-            inject=self
+            inject=self,
+            cancelExec='inject.entrance()',
+            withCancel=True
         )
 
     def menuitemExitAgent(self):
